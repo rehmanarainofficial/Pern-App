@@ -5,16 +5,15 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-} from "typeorm";
-import { User } from "../../user/entities/user.entity";
+} from 'typeorm';
+import { User } from '../../user/entities/user.entity';
 
-@Entity("posts")
+@Entity('posts')
 export class Post {
   @PrimaryGeneratedColumn()
   id!: number;
 
   @Column({
-    type: "text",
     nullable: true,
   })
   content!: string;
@@ -35,7 +34,7 @@ export class Post {
   commentsCount!: number;
 
   @ManyToOne(() => User, (user) => user.posts, {
-    onDelete: "CASCADE",
+    onDelete: 'CASCADE',
   })
   user!: User;
 

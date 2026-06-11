@@ -1,17 +1,26 @@
 import { Injectable } from '@nestjs/common';
 import { RegisterDto } from './dto/create-auth.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { User } from '../user/entities/user.entity';
-
+import { UserService } from '../user/user.service';
+import crypto from 'node:crypto';
+import * as bcrypt from 'bcrypt';
 @Injectable()
 export class AuthService {
-  constructor(@InjectRepository(User) private readonly userRepository: Repository<User>) {}
-  register(registerDto: RegisterDto) {
-    const user = this.userRepository.create({
+  constructor(private readonly userService: UserService) {}
+  async register(registerDto: RegisterDto) {
+    let username = `@${registerDto.username}${crypto.randomInt(1000, 9999)}`;
+    let otp = crypto.randomInt(100000, 999999).toString();
+    let otpExpiration = new Date();
+    otpExpiration.setMinutes(otpExpiration.getMinutes() + 10);
+
+    let hash = await bcrypt.hash(registerDto.password, 12);
+
+    return this.userService.create({
       ...registerDto,
-      username: registerDto.name.replace(/\s+/g, '').toLowerCase().trim(),
+      otp,
+      otpExpiration,
+      username,
+      isVerified: false,
+      password: hash,
     });
-    return this.userRepository.save(user);
   }
 }

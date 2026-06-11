@@ -1,36 +1,51 @@
 import {
-    Column,
-    CreateDateColumn,
-    Entity,
-    OneToMany,
-    PrimaryGeneratedColumn,
-    UpdateDateColumn,
-} from "typeorm";
-import { Post } from "../../post/entities/post.entity";
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { Post } from '../../post/entities/post.entity';
 
-@Entity("users")
+@Entity('users')
 export class User {
-    @PrimaryGeneratedColumn()
-    id!: number;
+  @PrimaryGeneratedColumn()
+  id!: number;
 
-    @Column({ nullable: false })
-    name!: string;
+  @Column({ nullable: false })
+  name!: string;
 
-    @Column({ unique: true, nullable: false })
-    username!: string;
+  @Column({ unique: true, nullable: false })
+  username!: string;
 
-    @Column({ unique: true, nullable: false })
-    email!: string;
+  @Column({ unique: true, nullable: false })
+  email!: string;
 
-    @Column({ nullable: false })
-    password!: string;
+  @Column({ nullable: false })
+  password!: string;
 
-    @OneToMany(() => Post, (post) => post.user)
-    posts!: Post[];
+  @Column({ nullable: true })
+  bio!: string;
 
-    @CreateDateColumn()
-    createdAt!: Date;
+  @Column({ nullable: true })
+  avatarUrl!: string;
 
-    @UpdateDateColumn()
-    updatedAt!: Date;
+  @OneToMany(() => Post, (post) => post.user)
+  posts!: Post[];
+
+  @Column({ nullable: true })
+  otp?: string;
+
+  @Column({ nullable: true, type: 'timestamp' })
+  otpExpiration!: Date;
+
+  @Column({ default: false })
+  isVerified!: boolean;
+
+  @CreateDateColumn()
+  createdAt!: Date;
+
+  @UpdateDateColumn()
+  updatedAt!: Date;
 }
