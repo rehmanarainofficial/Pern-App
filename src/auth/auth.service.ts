@@ -1,11 +1,12 @@
-import { Injectable } from '@nestjs/common';
-import { RegisterDto } from './dto/create-auth.dto';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { LoginDto, RegisterDto } from './dto/create-auth.dto';
 import { UserService } from '../user/user.service';
 import crypto from 'node:crypto';
 import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
 @Injectable()
 export class AuthService {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService, private readonly jwtService: JwtService) {}
   async register(registerDto: RegisterDto) {
     let username = `@${registerDto.username}${crypto.randomInt(1000, 9999)}`;
     let otp = crypto.randomInt(100000, 999999).toString();
@@ -22,5 +23,26 @@ export class AuthService {
       isVerified: false,
       password: hash,
     });
+  }
+
+  async login(loginDto: LoginDto) {
+    let user = await this.userService.findByEmailOrUsername(
+      loginDto.emailOrUsername,
+    );
+    if (!user) {
+      throw new BadRequestException('Invalid credentials');
+    }
+
+    const isPasswordValid = await bcrypt.compare(
+      loginDto.password,
+      user.password,
+    );
+
+    if (!isPasswordValid) {
+      throw new BadRequestException('Invalid credentials');
+    }
+
+    let token = await this.jwtService.signAsync({ id: user.id, username: user.username });
+    return { user, token };
   }
 }
