@@ -2,11 +2,13 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
+    private readonly mailService: MailService,
   ) {}
 
   async findByEmailOrUsername(emailOrUsername: string) {
@@ -28,7 +30,17 @@ export class UserService {
       );
     }
     const user = this.userRepository.create(registerDto);
-    return await this.userRepository.save(user);
+    let savedUser = await this.userRepository.save(user);
+
+    if (!savedUser.otp) {
+      throw new BadRequestException('OTP was not generated');
+    }
+    await this.mailService.sendOtp(
+      savedUser.email,
+      'Your OTP Code',
+      savedUser.otp!,
+    );
+    return savedUser;
   }
 
   async findAll() {

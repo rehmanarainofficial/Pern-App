@@ -4,9 +4,14 @@ import { UserService } from '../user/user.service';
 import crypto from 'node:crypto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { MailService } from '../mail/mail.service';
 @Injectable()
 export class AuthService {
-  constructor(private readonly userService: UserService, private readonly jwtService: JwtService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly jwtService: JwtService,
+    private readonly mailService: MailService,
+  ) {}
   async register(registerDto: RegisterDto) {
     let username = `@${registerDto.username}${crypto.randomInt(1000, 9999)}`;
     let otp = crypto.randomInt(100000, 999999).toString();
@@ -42,7 +47,10 @@ export class AuthService {
       throw new BadRequestException('Invalid credentials');
     }
 
-    let token = await this.jwtService.signAsync({ id: user.id, username: user.username });
+    let token = await this.jwtService.signAsync({
+      id: user.id,
+      username: user.username,
+    });
     return { user, token };
   }
 }

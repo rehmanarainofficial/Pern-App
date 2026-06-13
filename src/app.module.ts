@@ -1,3 +1,5 @@
+import { MailModule } from './mail/mail.module';
+import { MailService } from './mail/mail.service';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -8,7 +10,7 @@ import { UserModule } from './user/user.module';
 import { PostModule } from './post/post.module';
 
 @Module({
-  imports: [
+  imports: [ MailModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
@@ -30,6 +32,6 @@ import { PostModule } from './post/post.module';
     PostModule
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [ MailService,AppService],
 })
 export class AppModule {}

@@ -5,6 +5,7 @@ import { UserModule } from '../user/user.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
 import { AuthGuard } from './guards/auth.guard';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { AuthGuard } from './guards/auth.guard';
       signOptions: { expiresIn: '1h' },
     }),
     UserModule,
+    MailModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, AuthGuard],

@@ -3,20 +3,21 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   UseGuards,
-  Req,
   Request,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { AuthGuard } from '../auth/guards/auth.guard';
+import { MailService } from '../mail/mail.service';
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService,
+    private readonly mailService: MailService
+  ) {}
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
