@@ -2,7 +2,6 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
-import { RegisterDto } from '../auth/dto/create-auth.dto';
 
 @Injectable()
 export class UserService {
@@ -32,15 +31,33 @@ export class UserService {
     return await this.userRepository.save(user);
   }
 
-  findAll() {
-    return this.userRepository.find();
+  async findAll() {
+    let users = await this.userRepository.find();
+    if (!users) {
+      throw new BadRequestException('No users found');
+    }
+    return users;
   }
 
-  findOne(id: number) {
-    return this.userRepository.findOneBy({ id });
+  async findOne(id: number) {
+    let user = await this.userRepository.findOneBy({ id });
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+    return user;
   }
 
-  remove(id: number) {
-    return this.userRepository.delete({ id });
+  async profileMe(id: number) {
+    let user = await this.userRepository.findOneBy({ id });
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+    return user;
+  }
+  async remove(id: number) {
+    let deleteUser = await this.userRepository.delete({ id });
+    return deleteUser.affected
+      ? { message: 'User deleted successfully' }
+      : { message: 'User not found' };
   }
 }
